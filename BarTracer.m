@@ -9,7 +9,7 @@ classdef BarTracer < BarStimulus
 %         TargetLocation
         MaxFrame
 %         TargetScrCoordinates
-        ScreenInfo
+%         ScreenInfo
     end
     properties (Access = protected)
         % TargetID
@@ -50,12 +50,8 @@ classdef BarTracer < BarStimulus
             
             frame_idx = floor(frame_no/obj.Step) + 1;
             
-            p.dashboard(1, sprintf('Frame: %i', frame_no))
-            p.dashboard(3, sprintf('Scene time: %i', p.scene_time()))
-
             if continue_ 
                 obj.Position = obj.PaddedTrajectory(frame_idx,:);
-                p.dashboard(2, sprintf('Position: %i', obj.PaddedTrajectory(frame_idx,1)));
             
             end
             % if ~isempty(obj.TargetID), mglsetorigin(obj.TargetID,obj.TargetScrCoordinates); end

@@ -3,9 +3,10 @@ classdef BarStimulus < mlstimulus  % The file name should match the class name
         % Define input variables here. All variables should be initialized
         % before create_scene() is called.
         Position    % [x y] in DVA
-        Sizel       % Length of long size, in DVA 
+        Sizel       % ~ Length of long size, in DVA (approximation good for small ratio ie: Bar, otherwise Length = Size*cos(Ratio) 
         Ratio       % Thickness ratio, angle from 0 to pi/4
-        Orientation % Bar Orientation, angle from 0 to pi
+        % Small angle approximation: the Bar width is ~Size*Ratio
+        Orientation % Bar Orientation, angle from 0 to pi. 0 is a vertical Bar
         Color       % RGB [0 0 0]
         
     end
@@ -110,17 +111,20 @@ classdef BarStimulus < mlstimulus  % The file name should match the class name
                 destroy_graphic(obj);
                 
                 % Create Vertex
-                obj.Vertex = zeros(2,4);
-                x1 = cos(pi/2 - obj.Ratio)*0.5;
-                y1 = sin(pi/2 - obj.Ratio)*0.5;
-                obj.Vertex(1,1) = x1;
-                obj.Vertex(2,1) = - y1;
-                obj.Vertex(1,2) = x1;
-                obj.Vertex(2,2) = y1;
-                obj.Vertex(1,3) = - x1;
-                obj.Vertex(2,3) = y1;
-                obj.Vertex(1,4) = - x1;
-                obj.Vertex(2,4) = - y1;
+%                 obj.Vertex = zeros(2,4);
+                x1 = sin(obj.Ratio)*0.5; % cos(pi/2 -  x) = sin(x)
+                y1 = cos(obj.Ratio)*0.5; % sin(pi/2 -  x) = cos(x)
+                
+                obj.Vertex = [x1 -y1; x1 y1; -x1 y1; -x1 -y1]';
+                
+%                 obj.Vertex(1,1) = x1;
+%                 obj.Vertex(2,1) = - y1;
+%                 obj.Vertex(1,2) = x1;
+%                 obj.Vertex(2,2) = y1;
+%                 obj.Vertex(1,3) = - x1;
+%                 obj.Vertex(2,3) = y1;
+%                 obj.Vertex(1,4) = - x1;
+%                 obj.Vertex(2,4) = - y1;
                 
                 % Rotate Stimulus
                 rot_mat = [cos(obj.Orientation), -sin(obj.Orientation); sin(obj.Orientation), cos(obj.Orientation)];

@@ -7,20 +7,15 @@ fixation_point = 1;
 % Define properties
 fix_rad = 2;
 wait_time = 5000;
-fix_hold = 150;
-% fix_dur = 1500;
-% grace = 250;
-sample_time = 2500;
-% analysis_window = 1; %ms
+fix_hold = 50;
+bar_color = [0 0 0];  % RGB [0 0 0]
 
 % editables
-% Bar_speed = 0.1;
-% n_trajectories = 1;
-% editable('Bar_speed', 'n_trajectories');
-
-n_t = 350;
-x = linspace(-20, 20, n_t)';
-y = linspace(0, 0, n_t)';
+reward = 50;
+bar_speed = 10; % 10 Dva/s  From paper
+bar_width = 0.2; % 0.2 Dva From paper
+n_trajectories = 8; % 4 Orientation * 2 Direction
+editable('bar_speed', 'bar_width', 'n_trajectories', 'reward');
 
 % Creating Scene
 % Fixation Point
@@ -36,30 +31,19 @@ wth.HoldTime = fix_hold;
 scene1 = create_scene(wth, fixation_point);
 
 % Stimulus
+barRF = SuperBarTracerRF(null_);
+barRF.Bar_Speed = bar_speed;
+barRF.Bar_Width = bar_width;
+barRF.N_Trajectories = n_trajectories;
+barRF.Color = bar_color;          
+
+% Maintain Fixation during Trial
 wth2 = WaitThenHold(fix);
 wth2.WaitTime = 0;
-wth2.HoldTime = sample_time;
+wth2.HoldTime = barRF.PathTime * 1000;
 
-
-bar = BarTracer(null_);
-
-screeninfo = bar.ScreenInfo;
-screeninfo
-
-
-% % Trajectory
-bar.Trajectory = [x y];
-bar.Step = 1;  % target position update interval, in # of frames
-% bar.AnalysisWindow = analysis_window;
-
-bar.Position    = [0 0];            % [x y] in DVA
-bar.Sizel        = 2;               % Length of long size, in DVA 
-bar.Ratio       = pi/32;            % Thickness ratio, angle from 0 to pi/4
-bar.Orientation = 0;                % Bar Orientation, angle from 0 to pi
-bar.Color       = [1 1 1];          % RGB [0 0 0]
-
-con = Concurrent(wth2);            % The Concurrent adapter behaves as if it is lh2a, in terms of stopping scenes and setting Success,
-con.add(bar);                   % and run grat2b additionally but grat2b does not affect the progression or Success of the scene.
+con = Concurrent(wth2);           % The Concurrent adapter behaves as if it is lh2a, in terms of stopping scenes and setting Success,
+con.add(barRF);                   % and run grat2b additionally but grat2b does not affect the progression or Success of the scene.
 
 % create scenes
 scene2 = create_scene(con, fixation_point);
@@ -74,17 +58,24 @@ if ~wth.Success
     
 else
     run_scene(scene2)
-    % dashboard(3, 'Its running!', [0 1 0])
-    if ~wth.Success
+    
+    if ~wth2.Success
         idle(0);  % clear screen
         error_type = 3;  % broke fixation
     else
+        goodmonkey(reward)
         error_type = 0; % Success
     end
     
 end
 
 idle(0);
+
+% Save Trial Param
+trialerror(error_type);
+TrialRecord.User.PathId = barRF.PathId;
+TrialRecord.User.Trajectory = barRF.Trajectory;
+TrialRecord.User.PathTime = barRF.PathTime*1000;
 
 
 
