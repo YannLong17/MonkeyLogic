@@ -12,7 +12,7 @@ classdef Bar_RF_Mapper < BarStimulus
         KB_Hold
         bOldTracker
         colori = 1;
-        bar_width = 0.5;
+        bar_width;
         
     end
     methods
@@ -28,7 +28,7 @@ classdef Bar_RF_Mapper < BarStimulus
             obj.Picked = false;
             obj.RB_Hold = false;
             obj.KB_Hold = false(1,7);
-            obj.set_Ratio;
+            obj.bar_width = obj.Ratio * obj.Sizel;
             
         end
         function fini(obj,p)
