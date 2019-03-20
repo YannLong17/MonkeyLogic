@@ -135,7 +135,7 @@ classdef Bar_RF_Mapper < BarStimulus
             
             % display some information on the control screen
             p.dashboard(1,sprintf('Position = [%.1f %.1f], Bat Length = %.1f',obj.Position,obj.Sizel));
-            p.dashboard(2,sprintf('Orientation = %.1f, Bar Width = %.2f, theta = %.1f', rad2deg(obj.Orientation),obj.bar_width, theta));
+            p.dashboard(2,sprintf('Orientation = %.1f, Bar Width = %.2f', rad2deg(obj.Orientation),obj.bar_width));
 
         end
     end
