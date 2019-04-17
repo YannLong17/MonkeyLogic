@@ -1,6 +1,6 @@
 classdef Bar_RF_Mapper < BarStimulus
     properties
-        Colors = [0 0 0; 1 1 1];
+        Colore = [0 0 0];
         Orientation_Shift = pi/4;
     end
     properties (Access = protected)
@@ -13,7 +13,7 @@ classdef Bar_RF_Mapper < BarStimulus
         bOldTracker
         colori = 1;
         bar_width;
-        
+        Colors;
     end
     methods
         function obj = Bar_RF_Mapper(varargin)
@@ -36,12 +36,14 @@ classdef Bar_RF_Mapper < BarStimulus
             mglactivategraphic(obj.GraphicID,false);
         end
                      
-       function set.Colors(obj,val)
+       function set.Colore(obj,val)
              if isempty(val) || any(any(val<0)) || any(any(isnan(val))), val = [NaN NaN NaN]; end
-             if 3~=size(val,2), error('Colors must be a n-by-3 vector'); end
-            obj.Colors = val;
+             if 3~=size(val,2), error('Color must be a 1-by-3 vector'); end
+            obj.Colore = val;
             obj.colori = 1;
-            obj.Color = obj.Colors(obj.colori, :);
+            bgColor = obj.Tracker.Screen.BackgroundColor;
+            obj.Colors = [val; bgColor];
+            obj.Color = val;
        end
        
       function set.Orientation_Shift(obj,val)
