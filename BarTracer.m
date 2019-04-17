@@ -64,8 +64,6 @@ classdef BarTracer < BarStimulus
             padding = ceil(obj.AnalysisWindow / obj.Tracker.Screen.FrameLength) / obj.Step;
             if round(padding)~=padding, error('AnalysisWindow is not a multiple of the screen update interval (FrameLength * Step)'); end
             obj.PaddedTrajectory = [repmat(obj.Trajectory(1,:),padding,1); obj.Trajectory; obj.Trajectory(end,:)];
-            % obj.ScrPaddedTrajectory = obj.Tracker.CalFun.deg2pix(obj.PaddedTrajectory);
-            % obj.ScrPaddedTrajectory = obj.ScrPaddedTrajectory([2:end end],:);
             obj.MaxFrame = (padding + size(obj.Trajectory,1)) * obj.Step;
         end
     end

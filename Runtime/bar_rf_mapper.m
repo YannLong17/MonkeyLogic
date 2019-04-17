@@ -14,7 +14,7 @@ if isfield(TrialRecord.User,'position'), position = TrialRecord.User.position; e
 if isfield(TrialRecord.User,'sizel'), sizel = TrialRecord.User.sizel; else sizel = 2; end
 if isfield(TrialRecord.User,'orientation'), orientation = TrialRecord.User.orientation; else orientation = 0; end
 if isfield(TrialRecord.User,'ratio'), ratio = TrialRecord.User.ratio; else ratio = pi/32; end
-if isfield(TrialRecord.User,'color'), color = TrialRecord.User.color; else color = [0 0 0]; end
+% if isfield(TrialRecord.User,'color'), color = TrialRecord.User.color; else color = [0 0 0]; end
 
 % Condition Variable name
 fixation_point = 1;
@@ -26,8 +26,9 @@ fix_dur = 60000;
 grace = 500;
 reward = 40;
 reward_interval = 3000;
-colors = [0 0 0; 0.5 0.5 0.5];
-editable('reward', 'reward_interval')
+% colors = [0 0 0; 0.5 0.5 0.5];
+colore = [0,0,0];
+editable('reward', 'reward_interval', '-color', 'colore')
 
 
 % Fixation
@@ -61,8 +62,8 @@ bar.Position = position;
 bar.Orientation = orientation;
 bar.Sizel = sizel;
 bar.Ratio = ratio;
-bar.Colors = colors;
-bar.Color = color;
+bar.Colore = colore;
+% bar.Color = color;
 
 % Concurent adapter
 con = Concurrent(lh);
@@ -73,12 +74,12 @@ scene2 = create_scene(con, fixation_point);
 % Run task
 run_scene(scene1);
 if ~wth.Success
-	idle(0);  % clear screen
+% 	idle(0);  % clear screen
     error_type = 4;  % no fixation  
 else
     run_scene(scene2)
     if ~lh.Success
-        idle(0);  % clear screen
+%         idle(0);  % clear screen
         error_type = 3;  % broke fixation
     else
         error_type = 0; % Success
@@ -86,7 +87,7 @@ else
     
 end
 
-idle(0);
+idle(0); % clear screen
 
 % save parameters
 trialerror(error_type);
@@ -94,6 +95,6 @@ TrialRecord.User.position = bar.Position;
 TrialRecord.User.orientation = bar.Orientation;
 TrialRecord.User.sizel = bar.Sizel;
 TrialRecord.User.ratio = bar.Ratio;
-TrialRecord.User.color = bar.Color;
+% TrialRecord.User.color = bar.Color;
 
 

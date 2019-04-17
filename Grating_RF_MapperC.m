@@ -1,4 +1,4 @@
-classdef Grating_RF_MapperC < SineGrating
+classdef Grating_RF_MapperC < SineGratingC
     properties
         SpatialFrequencyStep = 0.2;
         TemporalFrequencyStep = 0.2;
@@ -16,12 +16,12 @@ classdef Grating_RF_MapperC < SineGrating
     end
     methods
         function obj = Grating_RF_MapperC(varargin)
-            obj = obj@SineGrating(varargin{:});
+            obj = obj@SineGratingC(varargin{:});
             obj.bOldTracker = isprop(obj.Tracker,'MouseData');
         end
         
         function init(obj,p)
-            init@SineGrating(obj,p);
+            init@SineGratingC(obj,p);
             obj.LB_Hold = false;
             obj.Picked = false;
             obj.RB_Hold = false;
@@ -29,12 +29,12 @@ classdef Grating_RF_MapperC < SineGrating
             obj.KB_Hold = false(1,6);
         end
         function fini(obj,p)
-            fini@SineGrating(obj,p);
+            fini@SineGratingC(obj,p);
             mglactivategraphic(obj.GraphicID,false);
         end
         
         function continue_ = analyze(obj,p)
-            continue_ = analyze@SineGrating(obj,p);
+            continue_ = analyze@SineGratingC(obj,p);
             
             % get the mouse and keyboard input
             if obj.bOldTracker
