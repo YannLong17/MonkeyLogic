@@ -5,7 +5,9 @@ classdef SineGratingC < mlstimulus
         Direction = 45;         % degrees
         SpatialFrequency = 1;   % cycles per deg
         TemporalFrequency = 2;  % cycles per sec
-        Color                   % RGB [0 0 0]
+        Color1                  % RGB [0 0 0]
+        Color2                  % RGB
+        Contrast                % Scalar between [0 1]
     end
     properties (Access = protected)
         GridX
@@ -21,6 +23,10 @@ classdef SineGratingC < mlstimulus
             
             obj.Position = [0 0];
             obj.Radius = 1;
+            obj.Color1 = [0 0 0];
+            obj.Color2 = [1 1 1];
+            obj.Contrast = 1;
+            
         end
         function delete(obj)
             destroy_graphic(obj);
@@ -50,10 +56,22 @@ classdef SineGratingC < mlstimulus
             obj.Imdata = imdata;
         end
         
-       function set.Color(obj,val)
+       function set.Color1(obj,val)
             if isempty(val) || any(val<0) || any(isnan(val)), val = [NaN NaN NaN]; end
             if 3~=numel(val), error('Color must be a 1-by-3 vector'); end
-            obj.Color = val(:)';
+            obj.Color1 = val(:)';
+       end
+       
+       function set.Color2(obj,val)
+            if isempty(val) || any(val<0) || any(isnan(val)), val = [NaN NaN NaN]; end
+            if 3~=numel(val), error('Color must be a 1-by-3 vector'); end
+            obj.Color2 = val(:)';
+       end
+       
+       function set.Contrast(obj,val)
+            if isempty(val) || any(val<0) || any(isnan(val)), val = NaN; end
+            if ~isscalar(val), error('Contrast must be a scalar'); end
+            obj.Contrast = min(1, val);
        end
         
         function init(obj,p)
@@ -83,9 +101,15 @@ classdef SineGratingC < mlstimulus
                 cycles_per_sec = obj.TemporalFrequency;
                 t = p.scene_frame() * p.Screen.FrameLength / 1000;  % in seconds
                 grating = (sind(360*cycles_per_deg*(obj.GridX*cosd(direction) + obj.GridY*sind(direction)) - 360*cycles_per_sec*t) + 1) / 2;
-                obj.Imdata(:,:,2) = grating*obj.Color(1);
-                obj.Imdata(:,:,3) = grating*obj.Color(2);
-                obj.Imdata(:,:,4) = grating*obj.Color(3);
+                
+                % Apply Contrast
+                bg = (obj.Color1 + obj.Color2)/2;   % Mean Between 2 colors
+                color_1 = bg + obj.Contrast*(obj.Color1-bg);
+                color_2 = bg + obj.Contrast*(obj.Color2-bg);
+
+                for i = 1:3
+                   obj.Imdata(:,:,i+1) = color_1(i) + grating*(color_2(i) - color_1(i)); 
+                end
 
                 obj.GraphicID = mgladdbitmap(obj.Imdata);
                 mglsetorigin(obj.GraphicID,obj.ScrPosition);

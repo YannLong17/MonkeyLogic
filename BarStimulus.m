@@ -8,6 +8,7 @@ classdef BarStimulus < mlstimulus  % The file name should match the class name
         % Small angle approximation: the Bar width is ~Size*Ratio
         Orientation % Bar Orientation, angle from 0 to pi. 0 is a vertical Bar
         Color       % RGB [0 0 0]
+        Contrast    % Value Between [0 1] 
         
     end
     properties (SetAccess = protected)
@@ -35,6 +36,7 @@ classdef BarStimulus < mlstimulus  % The file name should match the class name
             obj.Orientation = 0.0;
             obj.Ratio = pi/32;
             obj.Color = [1 1 1];
+            obj.Contrast = 1;
             
             obj.ScrSize = obj.Sizel * obj.Tracker.Screen.PixelsPerDegree;
             obj.ScrPosition = obj.Tracker.CalFun.deg2pix(obj.Position);
@@ -78,7 +80,12 @@ classdef BarStimulus < mlstimulus  % The file name should match the class name
             if 3~=numel(val), error('Color must be a 1-by-3 vector'); end
             obj.Color = val(:)';
        end
-        
+       
+       function set.Contrast(obj,val)
+            if isempty(val) || any(val<0) || any(isnan(val)), val = NaN; end
+            if ~isscalar(val), error('Contrast must be a scalar'); end
+            obj.Contrast = min(1, val);
+       end
         
         function init(obj,p)
             init@mlstimulus(obj,p);
@@ -130,8 +137,13 @@ classdef BarStimulus < mlstimulus  % The file name should match the class name
                 rot_mat = [cos(obj.Orientation), -sin(obj.Orientation); sin(obj.Orientation), cos(obj.Orientation)];
                 obj.Vertex = rot_mat*obj.Vertex + 0.5;
                 
+                % Apply Contrast
+                bg = obj.Tracker.Screen.BackgroundColor;    % Background Color
+                color_contrast = bg + obj.Contrast*(obj.Color-bg);
+                
+                
                 % Draw Stimulus
-                obj.GraphicID = mgladdpolygon([obj.Color, obj.Color],obj.ScrSize,[obj.Vertex(1,:)' 1-obj.Vertex(2,:)']);
+                obj.GraphicID = mgladdpolygon([color_contrast, color_contrast],obj.ScrSize,[obj.Vertex(1,:)' 1-obj.Vertex(2,:)']);
                 mglsetorigin(obj.GraphicID,obj.ScrPosition);
                            
             end
