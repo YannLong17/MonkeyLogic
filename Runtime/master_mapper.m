@@ -18,7 +18,10 @@ reward_interval = 3000;
 
 %Stimulus
 color = [0 0 0];
+color2 = [1 1 1]; % For Grating
 stimulus = 1; % 1: Bar, 2: Grating, 3: RDM Dots
+contrast = 1;
+
 
 % Grating Property
 SpatialFrequencyStep = 0.1;
@@ -29,7 +32,7 @@ coherence = 100;
 numDot = 100;
 dotSize = 0.15;
 
-editable('reward', 'reward_interval','-color','color', 'stimulus', 'SpatialFrequencyStep','TemporalFrequencyStep', 'coherence','numDot','dotSize')
+editable('reward', 'reward_interval','-color','color', '-color', 'color2', 'stimulus', 'contrast', 'SpatialFrequencyStep','TemporalFrequencyStep', 'coherence','numDot','dotSize')
 
 % Parameter (for continuity)
 switch stimulus
@@ -108,6 +111,7 @@ switch stimulus
         stim.Sizel = sizel;
         stim.Ratio = ratio;
         stim.Colore = color;
+        stim.Contrast = contrast;
 
     case 2
         stim = Grating_RF_MapperC(mouse_);
@@ -118,7 +122,9 @@ switch stimulus
         stim.Direction = direction;
         stim.SpatialFrequency = spatial_frequency;
         stim.TemporalFrequency = temporal_frequency;
-        stim.Color = color;
+        stim.Color1 = color;
+        stim.Color2 = color2;
+        stim.Contrast = contrast;
         
     case 3
         stim = RDM_RF_MapperC(mouse_);
