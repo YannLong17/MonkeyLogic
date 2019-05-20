@@ -42,13 +42,15 @@ sacc_y = 0;
 % Editable
 editable('reward', 'fix_radius', 'rf_x', 'rf_y', 'stim_size', 'orientation', 'sacc_x', 'sacc_y', '-color', 'color', '-color', 'color2', 'stimulus', 'TemporalFrequency', 'SpatialFrequency')
 
-% Save parameters to TrialRecord
+% Save parameters to TrialRecord (does Nothing)
 TrialRecord.User.sacc = [sacc_x, sacc_y];
 TrialRecord.User.orientation = orientation;
 TrialRecord.User.rf_x = rf_x;
 TrialRecord.User.rf_y = rf_y;
 % Randomly Choose a contrast
 TrialRecord.User.contrast = stim_contrast(randi(length(stim_contrast)));
+% Mask on/off
+TrialRecord.User.mask = binornd(1, 0.5);
 TrialRecord.User.Stimulus = stimulus;
 
 %%  Create The Stimulus Objects
@@ -71,6 +73,7 @@ switch stimulus
         mask.Ratio = 1/4;          
         mask.Orientation = orientation;
         mask.Color = color;
+        mask.Contrast = TrialRecord.User.mask;
 
         % Target Stimulus
         target = BarStimulus(null_);
@@ -90,6 +93,8 @@ switch stimulus
         mask.TemporalFrequency = TemporalFrequency;  % cycles per sec
         mask.Color1 = color;                  % RGB [0 0 0]
         mask.Color2 = color2;                 % RGB
+        mask.Contrast = TrialRecord.User.mask;
+
 
         target = SineGratingC(null_);
         target.Radius = stim_size;                  % aperture radius in degrees
@@ -236,12 +241,19 @@ else
             end
         end
     end
-    end
+end
 
+    % Record Saccade Latency and Duration
 if TrialRecord.CurrentCondition == 1
     TrialRecord.User.saccade_latency = sacc_detect_wait.AcquiredTime; % Saccade Latency, need to save to a user variable
     TrialRecord.User.saccade_duration = aquire2.AcquiredTime; % 2/3 Saccade Time
+    bhv_variable('saccade_latency', TrialRecord.User.saccade_latency);
+    bhv_variable('saccade_duration', TrialRecord.User.saccade_duration);
 end
+
+% Save bhv variables to BHV2 File
+bhv_variable('mask', TrialRecord.User.mask);
+bhv_variable('contrast', TrialRecord.User.contrast);
 
 idle(0); % clear screen
 trialerror(error_type);
